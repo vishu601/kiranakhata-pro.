@@ -17,4 +17,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app/
 
 # 7. Django server start karne ki command
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Purani CMD line ko hata kar ye daal do
+CMD python manage.py migrate && python manage.py runserver 0.0.0.0:8000
