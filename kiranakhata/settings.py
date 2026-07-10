@@ -122,3 +122,13 @@ STATIC_URL = 'static/'
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_REDIRECT_URL = 'dashboard'
+
+
+# Render ke secure domain ko trust karne ke liye
+CSRF_TRUSTED_ORIGINS = [
+    'https://kiranakhata-pro.onrender.com',
+]
+
+# Secure secure cookie settings cloud ke liye
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
