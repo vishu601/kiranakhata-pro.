@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KiranaKhata Pro - Advanced SaaS Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f8fafc; font-family: 'Segoe UI', system-ui, -apple-system; }
+        .metric-card { border: none; border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s; }
+        .metric-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+        .table-card { border: none; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .badge-udhaar { background-color: #fee2e2; color: #dc2626; font-weight: 600; }
+        .badge-jama { background-color: #dcfce7; color: #16a34a; font-weight: 600; }
+        .sticky-summary { position: sticky; top: 90px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-3">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold fs-3 text-white" href="{% url 'dashboard' %}">
+                🏪 KiranaKhata <span class="text-warning">Pro</span>
+            </a>
+            <div class="d-flex align-items-center ms-auto">
+                <div class="text-white text-end me-3 d-none d-sm-block">
+                    <span class="fw-bold text-success"><i class="fa-solid fa-circle-check me-1"></i>{{ username }}</span>
+                </div>
+                <form action="{% url 'logout' %}" method="POST" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-md px-4 fw-bold rounded-pill"><i class="fa-solid fa-power-off me-2"></i>Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4 py-4">
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm border-0 mb-4" role="alert">
+                    <i class="fa-solid fa-square-check me-2 fs-5"></i> {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card metric-card bg-white p-4 shadow-sm border-start border-primary border-5">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-muted text-uppercase fw-semibold mb-2 small">Total Grahak</h6>
+                            <h2 class="fw-bold text-dark mb-0">{{ total_customers }}</h2>
+                        </div>
+                        <div class="p-3 bg-primary bg-opacity-10 rounded-4 text-primary fs-3">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card metric-card bg-white p-4 shadow-sm border-start border-danger border-5">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-muted text-uppercase fw-semibold mb-2 small">Kul Market Udhaar</h6>
+                            <h2 class="fw-bold text-danger mb-0">₹{{ total_market_udhaar }}</h2>
+                        </div>
+                        <div class="p-3 bg-danger bg-opacity-10 rounded-4 text-danger fs-3">
+                            <i class="fa-solid fa-money-bill-trend-up"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card metric-card bg-white p-4 shadow-sm border-start border-success border-5">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-muted text-uppercase fw-semibold mb-2 small">Aaj Ki Recovery (Jama)</h6>
+                            <h2 class="fw-bold text-success mb-0">₹{{ todays_recovery }}</h2>
+                        </div>
+                        <div class="p-3 bg-success bg-opacity-10 rounded-4 text-success fs-3">
+                            <i class="fa-solid fa-hand-holding-dollar"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            
+            <div class="col-lg-8">
+                <div class="card table-card bg-white p-4 mb-4">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                        <h4 class="fw-bold text-dark mb-0">📁 Grahak Khata Register</h4>
+                        <form method="GET" action="{% url 'dashboard' %}" class="d-flex gap-2 m-0">
+                            <input type="text" name="search" class="form-control bg-light" placeholder="Naam dhoondhein..." value="{{ search_query }}">
+                            <button type="submit" class="btn btn-dark px-4">Search</button>
+                        </form>
+                    </div>
+                </div>
+
+                {% if customers_data %}
+                    {% for item in customers_data %}
+                        <div class="card table-card bg-white p-4 mb-3 border {% if item.is_alert %}border-danger border-2{% endif %}">
+                            <div class="row align-items-center g-3">
+                                <div class="col-md-5">
+                                    <h5 class="fw-bold mb-1 text-primary">{{ item.obj.name }}</h5>
+                                    <p class="text-muted small mb-0"><i class="fa-solid fa-phone me-1"></i>{{ item.obj.phone|default:"No Phone" }}</p>
+                                    <div class="mt-2">
+                                        <small class="text-muted">Limit: </small><span class="badge bg-secondary">₹{{ item.obj.credit_limit }}</span>
+                                        {% if item.is_alert %}
+                                            <span class="badge bg-danger ms-1">Limit Alert!</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-md-center">
+                                    <small class="text-muted d-block small fw-bold">Khaata Balance</small>
+                                    {% if item.net_balance > 0 %}
+                                        <h4 class="fw-bold text-danger mb-0">₹{{ item.abs_balance }} <small class="fs-6 text-muted d-block">baaki hai</small></h4>
+                                    {% elif item.net_balance < 0 %}
+                                        <h4 class="fw-bold text-success mb-0">₹{{ item.abs_balance }} <small class="fs-6 text-muted d-block">advance</small></h4>
+                                    {% else %}
+                                        <h4 class="fw-bold text-muted mb-0">₹0.00 <small class="fs-6 text-muted d-block">saaf</small></h4>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <button class="btn btn-sm btn-outline-primary fw-bold" data-bs-toggle="collapse" data-bs-target="#ledger-{{ item.obj.id }}">
+                                        <i class="fa-solid fa-list-check me-1"></i> Passbook Log
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="collapse mt-3 pt-3 border-top" id="ledger-{{ item.obj.id }}">
+                                <h6 class="fw-bold text-secondary mb-2">History Entries:</h6>
+                                {% if item.transactions %}
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Type</th>
+                                                    <th>Amount</th>
+                                                    <th>Details</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for tx in item.transactions %}
+                                                <tr>
+                                                    <td class="small text-muted">{{ tx.date|date:"d M, h:i A" }}</td>
+                                                    <td>
+                                                        <span class="badge {% if tx.transaction_type == 'UDHAAR' %}badge-udhaar{% else %}badge-jama{% endif %}">
+                                                            {{ tx.transaction_type }}
+                                                        </span>
+                                                    </td>
+                                                    <td class="fw-bold {% if tx.transaction_type == 'UDHAAR' %}text-danger{% else %}text-success{% endif %}">₹{{ tx.amount }}</td>
+                                                    <td class="small text-secondary">{{ tx.description|default:"—" }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted small text-center my-1">Koi transactions nahi hain.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="card p-5 text-center table-card bg-white">
+                        <p class="text-muted mb-0">Koi grahak nahi mila. Naya jodein!</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-4">
+                <div class="sticky-summary">
+                    
+                    <div class="card table-card bg-white p-4 mb-4 border-top border-primary border-4 shadow-sm">
+                        <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-user-plus text-primary me-2"></i>Naya Grahak</h5>
+                        <form method="POST" action="{% url 'dashboard' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_customer">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Naam</label>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Mobile</label>
+                                <input type="text" name="phone" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Limit (₹)</label>
+                                <input type="number" name="credit_limit" class="form-control" value="5000">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 fw-bold">Register</button>
+                        </form>
+                    </div>
+
+                    <div class="card table-card bg-white p-4 mb-4 border-top border-warning border-4 shadow-sm">
+                        <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-calculator text-warning me-2"></i>Naya Sauda (Entry)</h5>
+                        <form method="POST" action="{% url 'dashboard' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_transaction">
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Grahak Chunein</label>
+                                <select name="customer_id" class="form-select" required>
+                                    <option value="" disabled selected>— Select —</option>
+                                    {% for item in customers_data %}
+                                        <option value="{{ item.obj.id }}">{{ item.obj.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="row g-2">
+                                    <div class="col">
+                                        <input type="radio" class="btn-check" name="transaction_type" id="t-udhaar" value="UDHAAR" checked>
+                                        <label class="btn btn-outline-danger w-100 fw-bold btn-sm py-2" for="t-udhaar">MAAL DIYA</label>
+                                    </div>
+                                    <div class="col">
+                                        <input type="radio" class="btn-check" name="transaction_type" id="t-jama" value="JAMA">
+                                        <label class="btn btn-outline-success w-100 fw-bold btn-sm py-2" for="t-jama">PAISE MILE</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Amount (₹)</label>
+                                <input type="number" name="amount" class="form-control fw-bold" placeholder="0.00" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Details</label>
+                                <input type="text" name="description" class="form-control" placeholder="Surf excel, chini, cash, etc.">
+                            </div>
+
+                            <button type="submit" class="btn btn-dark text-warning w-100 fw-bold">Khaata Update</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
