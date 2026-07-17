@@ -18,4 +18,5 @@ COPY . /app/
 
 # 7. Django server start karne ki command
 # Purani CMD line ko hata kar ye daal do
-CMD python manage.py migrate && python manage.py runserver 0.0.0.0:8000
+# Ye line honi chahiye:
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
