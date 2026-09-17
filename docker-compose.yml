@@ -1,3 +1,4 @@
+
 services:
   web:
     build: .
@@ -35,3 +36,38 @@ volumes:
   mongodata:
   grafanadata:
 
+version: '3.8'
+
+services:
+  # 1. Hamara PostgreSQL Database Container
+  db:
+    image: postgres:15
+    container_name: kotatiffin_db
+    environment:
+      POSTGRES_DB: kotatiffin_db
+      POSTGRES_USER: vishal_dev
+      POSTGRES_PASSWORD: mysecretpassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # 2. Hamara Django Backend Container
+  web:
+    build: .
+    container_name: kotatiffin_web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8089:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=kotatiffin_db
+      - DB_USER=vishal_dev
+      - DB_PASSWORD=mysecretpassword
+    depends_on:
+      - db
+
+volumes:
+  postgres_data: 8df3d4fb52dba3dc03c59cb525869371ac1a4b43
