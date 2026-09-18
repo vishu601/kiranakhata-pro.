@@ -33,9 +33,9 @@ jobs:
     needs: ci
     runs-on: self-hosted
     steps:
-      - name: Navigate to project folder and pull latest code
+      - name: Navigate to project folder and pull latest code #this project 
         run: |
-          cd /home/ubuntu/kiranakhata-pro.
+          cd /home/ubuntu/kiranakhata-pro.  
           git pull origin main
 
       - name: Build and Run Docker Stack on EC2  #this Ec2
