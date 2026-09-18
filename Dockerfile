@@ -30,8 +30,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 6. Poora project ka code container ke andar copy kar rahe hain
 COPY . /app/
 
-# 7. Django server start karne ki command
-# Purani CMD line ko hata kar ye daal do
-# Ye line honi chahiye:
->>>>>>> 8df3d4fb52dba3dc03c59cb525869371ac1a4b43
+
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
