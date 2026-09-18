@@ -1,66 +1,15 @@
-
-services:
-  web:
-    build: .
-    ports:
-      - "8000:8000"
-    restart: always
-    environment:
-      - DATABASE_URL=postgres://myuser:mypassword@db:5432/mydb
-    depends_on:
-      - db
-
-  db:
-    image: postgres:15-alpine
-    restart: always
-    environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafanadata:/var/lib/grafana
-    restart: always
-
-
-volumes:
-  pgdata:
-  mysqldata:
-  mongodata:
-  grafanadata:
-
 version: '3.8'
 
 services:
-  # 1. Hamara PostgreSQL Database Container
-  db:
-    image: postgres:15
-    container_name: kotatiffin_db
-    environment:
-      POSTGRES_DB: kotatiffin_db
-      POSTGRES_USER: vishal_dev
-      POSTGRES_PASSWORD: mysecretpassword
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
-  # 2. Hamara Django Backend Container
   web:
     build: .
-    container_name: kotatiffin_web
+    container_name: kiranakhata-pro-web
     command: python manage.py runserver 0.0.0.0:8000
+    restart: always
+    ports:
+      - "8000:8000"
     volumes:
       - .:/app
-    ports:
-      - "8089:8000"
     environment:
       - DB_HOST=db
       - DB_NAME=kotatiffin_db
@@ -69,5 +18,28 @@ services:
     depends_on:
       - db
 
+  db:
+    image: postgres:15-alpine
+    container_name: kiranakhata-pro-db-1
+    restart: always
+    environment:
+      POSTGRES_DB: kotatiffin_db
+      POSTGRES_USER: vishal_dev
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafanadata:/var/lib/grafana
+
 volumes:
-  postgres_data: 8df3d4fb52dba3dc03c59cb525869371ac1a4b43
+  postgres_data:
+  grafanadata:
