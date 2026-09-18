@@ -1,45 +1,52 @@
-name: CI/CD Pipeline
+version: '3.8'
 
-on:
-  push:
-    branches: [ "main" ]
+services:
+  # 1. Django Backend Container
+  web:
+    build: .
+    container_name: kotatiffin_web
+    command: python manage.py runserver 0.0.0.0:8000
+    restart: always
+    ports:
+      - "8089:8000"
+    volumes:
+      - .:/app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=kotatiffin_db
+      - DB_USER=vishal_dev
+      - DB_PASSWORD=mysecretpassword
+      - DATABASE_URL=postgres://vishal_dev:mysecretpassword@db:5432/kotatiffin_db
+    depends_on:
+      - db
 
-jobs:
-  ci:
-    name: Continuous Integration (CI)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+  # 2. PostgreSQL Database Container
+  db:
+    image: postgres:15-alpine
+    container_name: kotatiffin_db
+    restart: always
+    environment:
+      POSTGRES_DB: kotatiffin_db
+      POSTGRES_USER: vishal_dev
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
+  # 3. Grafana Monitoring Container
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafanadata:/var/lib/grafana
 
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run Database Migrations & System Checks
-        run: |
-          python manage.py makemigrations
-          python manage.py migrate
-          python manage.py check
-
-  cd:
-    name: Continuous Deployment (CD)
-    needs: ci
-    runs-on: self-hosted
-    steps:
-      - name: Navigate to project folder and pull latest code #this project 
-        run: |
-          cd /home/ubuntu/kiranakhata-pro.  
-          git pull origin main
-
-      - name: Build and Run Docker Stack on EC2  #this Ec2
-        run: |
-          cd /home/ubuntu/kiranakhata-pro.
-          sudo docker-compose up -d --build
-          sudo docker-compose ps
+volumes:
+  postgres_data:
+  grafanadata:
+  pgdata:
+  mysqldata:
+  mongodata:
