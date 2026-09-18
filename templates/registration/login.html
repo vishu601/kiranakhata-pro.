@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { 
-            background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
+            /* Naya Sky Blue Gradient */
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -20,29 +21,39 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.3);
             border-radius: 25px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
             padding: 40px !important;
         }
         .btn-primary { 
-            background: linear-gradient(45deg, #ff5e62, #ff9966);
+            /* Button color updated to match sky blue theme */
+            background: linear-gradient(45deg, #007bff, #00c6ff);
             border: none;
             transition: 0.3s;
         }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .btn-primary:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 10px 20px rgba(0,123,255,0.3); 
+            background: linear-gradient(45deg, #00c6ff, #007bff);
+        }
         .form-control { border-radius: 10px; padding: 12px; background: #f8f9fa; }
+        
+        /* Text gradient updated to match blue theme */
         .text-gradient { 
-            background: linear-gradient(to right, #ff5e62, #ff9966);
+            background: linear-gradient(to right, #007bff, #00c6ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+        .text-main-label {
+            color: #0056b3; /* Darker blue for main text */
         }
     </style>
 </head>
 <body>
 
 <div class="container" style="max-width: 400px;">
-    <div class="text-center mb-4 text-white">
-        <h2 class="fw-bold">🏪 KiranaKhata <span class="text-warning">Pro</span></h2>
-        <p>Apni dukan ko digital banayein</p>
+    <div class="text-center mb-4 text-main-label">
+        <h2 class="fw-bold">🏪 KiranaKhata <span class="text-primary">Pro</span></h2>
+        <p class="text-secondary">Apni dukan ko digital banayein</p>
     </div>
     
     <div class="card">
